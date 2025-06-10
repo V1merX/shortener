@@ -7,7 +7,7 @@ import (
 	"net/http"
 	"time"
 
-	"github.com/V1merX/link-shorter/internal/store"
+	"github.com/V1merX/shorter/internal/store"
 )
 
 type Handler struct {

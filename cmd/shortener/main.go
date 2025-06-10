@@ -1,8 +1,8 @@
 package main
 
 import (
-	"github.com/V1merX/link-shorter/internal/app"
-	"github.com/V1merX/link-shorter/internal/store"
+	"github.com/V1merX/shorter/internal/app"
+	"github.com/V1merX/shorter/internal/store"
 )
 
 const (
