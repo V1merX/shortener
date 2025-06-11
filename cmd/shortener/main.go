@@ -24,7 +24,3 @@ func run() error {
 	}
 	return nil
 }
-
-func sum(x, y int) int {
-	return x + y
-}
