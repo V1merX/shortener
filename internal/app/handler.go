@@ -22,7 +22,17 @@ func NewHandler(memoryStorage *store.MemoryStorage) *Handler {
 
 var alph string = "qwertyuiopasdfghjklzxcvbnmQWERTYUIOPASDFGHJKLZXCVBNM"
 
-func (h *Handler) indexHandler(w http.ResponseWriter, r *http.Request) {
+func (h *Handler) getLink(w http.ResponseWriter, r *http.Request) {
+	targetURL, err := h.MemoryStorage.Get(r.PathValue("id"))
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
+		return
+	}
+
+	http.Redirect(w, r, targetURL, http.StatusTemporaryRedirect)
+}
+
+func (h *Handler) createLink(w http.ResponseWriter, r *http.Request) {
 	rand.New(rand.NewSource(time.Now().Unix()))
 
 	var randomString string
@@ -30,33 +40,18 @@ func (h *Handler) indexHandler(w http.ResponseWriter, r *http.Request) {
 	for i := 0; i < 8; i++ {
 		randomString += string(alph[rand.Intn(len(alph))])
 	}
+	w.Header().Add(
+		"Content-Type", "text/plain",
+	)
 
-	if r.Method == http.MethodPost {
-		w.Header().Add(
-			"Content-Type", "text/plain",
-		)
-
-		body, err := io.ReadAll(r.Body)
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-
-		h.MemoryStorage.Set(randomString, string(body))
-
-		w.WriteHeader(http.StatusCreated)
-		w.Write([]byte(fmt.Sprintf("http://localhost:8080/%s", randomString)))
-		return
-	} else if r.Method == http.MethodGet {
-		targetURL, err := h.MemoryStorage.Get(r.RequestURI[1:])
-		if err != nil {
-			w.WriteHeader(http.StatusBadRequest)
-			return
-		}
-
-		http.Redirect(w, r, targetURL, http.StatusTemporaryRedirect)
+	body, err := io.ReadAll(r.Body)
+	if err != nil {
+		w.WriteHeader(http.StatusBadRequest)
 		return
 	}
 
-	w.WriteHeader(http.StatusBadRequest)
+	h.MemoryStorage.Set(randomString, string(body))
+
+	w.WriteHeader(http.StatusCreated)
+	w.Write([]byte(fmt.Sprintf("http://localhost:8080/%s", randomString)))
 }
